@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 // State management
 let gameState = {
   phase: 'IDLE', // 'IDLE' | 'VOTING' | 'LOCKED' | 'REVEALED'
-  statement: 'Welcome to Would Cardiff University Lie to You? Waiting for the presenter to start...',
+  statement: 'Waiting for the presenter to start...',
   speaker: 'Presenter',
   correctAnswer: null, // 'TRUTH' | 'LIE'
   votes: {}, // socketId -> 'TRUTH' | 'LIE'
@@ -111,7 +111,7 @@ function calculateTallies() {
 function broadcastState() {
   calculateTallies();
   const activeConnections = io.engine.clientsCount;
-  
+
   io.emit('state-update', {
     phase: gameState.phase,
     statement: gameState.statement,
@@ -155,10 +155,10 @@ io.on('connection', (socket) => {
 
     gameState.votes[socket.id] = choice;
     calculateTallies();
-    
+
     // Acknowledge vote to sender
     socket.emit('vote-acknowledged', { choice });
-    
+
     // Broadcast live tallies & update to everyone
     broadcastState();
   });

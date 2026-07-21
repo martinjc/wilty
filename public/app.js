@@ -55,7 +55,7 @@ function initDisplayView() {
   // Receive state updates
   socket.on('state-update', (data) => {
     // Statement and Speaker
-    if (statementElem) statementElem.textContent = data.statement || 'Waiting for presenter...';
+    if (statementElem && data.phase !== 'IDLE') statementElem.textContent = data.statement || 'Waiting for a new statement...';
     if (speakerElem) speakerElem.textContent = data.speaker || 'Presenter';
 
     // Status Badge
@@ -78,11 +78,18 @@ function initDisplayView() {
     if (data.phase === 'REVEALED' && data.correctAnswer) {
       if (revealBanner) {
         revealBanner.className = `reveal-banner reveal-${data.correctAnswer}`;
-        if (revealTitleSub) revealTitleSub.textContent = `THE VERDICT IS:`;
-        if (revealTitleMain) revealTitleMain.textContent = data.correctAnswer === 'TRUTH' ? "It's the TRUTH! 🎉" : "It's a LIE! ❌";
+        if (revealTitleSub) revealTitleSub.textContent = `THE OFFICIAL VERDICT IS`;
+        if (revealTitleMain) revealTitleMain.textContent = data.correctAnswer === 'TRUTH' ? 'IT IS A TRUTH! 🎉' : 'IT IS A LIE! ❌';
       }
     } else {
       if (revealBanner) revealBanner.className = 'reveal-banner';
+    }
+
+    // Idle phrases: start rotating when IDLE, stop when a statement is active
+    if (data.phase === 'IDLE') {
+      startIdlePhrases('display-statement');
+    } else {
+      stopIdlePhrases();
     }
   });
 
@@ -140,8 +147,15 @@ function initAudienceView() {
   });
 
   socket.on('state-update', (data) => {
-    if (statementElem) statementElem.textContent = data.statement || 'Waiting for statement...';
+    if (statementElem && data.phase !== 'IDLE') statementElem.textContent = data.statement || 'Waiting for the next statement...';
     if (speakerElem) speakerElem.textContent = data.speaker || 'Presenter';
+
+    // Idle phrases on vote page
+    if (data.phase === 'IDLE') {
+      startIdlePhrases('audience-statement');
+    } else {
+      stopIdlePhrases();
+    }
 
     // If phase transitions to VOTING and we haven't voted yet for this statement
     if (data.phase === 'VOTING') {
@@ -360,4 +374,50 @@ function updateStatusBadge(dotElem, textElem, phase) {
   } else {
     textElem.textContent = 'WAITING FOR START';
   }
+}
+
+
+// ============================================================================
+// Idle phrase rotation
+// ============================================================================
+const idlePhrases = [
+  'Waiting for a whopper...',
+  'Awaiting the next fib...',
+  'Hoping for another fib...',
+  'In search of the next tall tale...',
+  'Waiting for a doozy...',
+  'Expecting another yarn...',
+  'Prepared for the next big lie...',
+  'Warming up for the next whopper...',
+  'Awaiting the next massive fib...',
+  'Hungry for more lies...',
+  'Waiting for the next whopper...',
+  'In anticipation of the next fib...',
+];
+
+let idlePhraseIndex = 0;
+let idleInterval = null;
+
+function startIdlePhrases(elementId) {
+  stopIdlePhrases(elementId);
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  idlePhraseIndex = Math.floor(Math.random() * idlePhrases.length);
+  updateDisplayIdle(el);
+  idleInterval = setInterval(() => {
+    updateDisplayIdle(el);
+  }, 10000);
+}
+
+function stopIdlePhrases(elementId) {
+  if (idleInterval) {
+    clearInterval(idleInterval);
+    idleInterval = null;
+  }
+}
+
+function updateDisplayIdle(el) {
+  if (!el) return;
+  el.textContent = idlePhrases[idlePhraseIndex];
+  idlePhraseIndex = (idlePhraseIndex + 1) % idlePhrases.length;
 }
