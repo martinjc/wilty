@@ -1,0 +1,793 @@
+/* Import clean modern web font */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Cardiff University Design System Tokens (from static.cardiff.ac.uk/bingo/) */
+  --cu-red: #e4251b;
+  --cu-red-dark: #b61e16;
+  --cu-red-deep: #b61e16;
+  --cu-ink: #121212;
+  --cu-slate: #4a4a52;
+  --cu-cloud: #f4f4f6;
+  --cu-line: #e2e2e8;
+  --cu-white: #ffffff;
+  --cu-gold: #ffb300;
+  
+  /* Vote Accent Colors adapted to Cardiff palette */
+  --truth-color: #059669;
+  --truth-bg: #d1fae5;
+  --truth-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --truth-glow: rgba(5, 150, 105, 0.25);
+
+  --lie-color: var(--cu-red);
+  --lie-bg: #ffe3e9;
+  --lie-gradient: linear-gradient(135deg, #b61e16 0%, #e4251b 100%);
+  --lie-glow: rgba(228, 37, 27, 0.25);
+
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 50px rgba(107, 0, 22, 0.18);
+
+  --font-main: Segoe UI, system-ui, -apple-system, 'Plus Jakarta Sans', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--cu-cloud);
+  color: var(--cu-ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   CARDIFF UNIVERSITY APP HEADER
+   ========================================================================== */
+.top-bar {
+  background: linear-gradient(135deg, var(--cu-red) 0%, var(--cu-red-deep) 100%);
+  color: var(--cu-white);
+  box-shadow: var(--shadow);
+  padding: 1.2rem clamp(1rem, 4vw, 3rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--cu-white);
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--cu-white);
+  color: var(--cu-red-deep);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-weight: 900;
+}
+
+/* Status Badges / Pills */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--cu-white);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.pulse-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--cu-white);
+  box-shadow: 0 0 8px var(--cu-white);
+}
+
+.pulse-dot.voting {
+  background-color: #34d399;
+  box-shadow: 0 0 10px #34d399;
+  animation: pulse-glow 1.5s infinite;
+}
+
+.pulse-dot.locked {
+  background-color: var(--cu-gold);
+  box-shadow: 0 0 10px var(--cu-gold);
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+/* ==========================================================================
+   CARDS & CONTAINERS (MATCHING CARDIFF BINGO CARDS)
+   ========================================================================== */
+.glass-card {
+  background: var(--cu-white);
+  border-radius: var(--radius);
+  border: 1px solid var(--cu-line);
+  border-top: 6px solid var(--cu-red);
+  box-shadow: var(--shadow-lg);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* ==========================================================================
+   1. MAIN DISPLAY SCREEN (/display)
+   ========================================================================== */
+.display-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem);
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.display-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .display-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statement-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.speaker-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  background: var(--lie-bg);
+  color: var(--cu-red-deep);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  width: fit-content;
+}
+
+.statement-text {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--cu-ink);
+  letter-spacing: -0.01em;
+}
+
+/* QR Code Showcase Box */
+.qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  background: var(--cu-white);
+  border-top-color: var(--cu-red-deep);
+}
+
+.qr-wrapper {
+  background: var(--cu-white);
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 2px solid var(--cu-line);
+  box-shadow: var(--shadow);
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.qr-instructions {
+  font-size: 0.95rem;
+  color: var(--cu-slate);
+}
+
+.qr-instructions strong {
+  color: var(--cu-red-deep);
+  display: block;
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+  font-weight: 800;
+}
+
+.qr-url-pill {
+  background: var(--cu-cloud);
+  border: 1px solid var(--cu-line);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--cu-ink);
+  word-break: break-all;
+}
+
+/* Results Display Cards */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.results-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--cu-ink);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.total-votes-count {
+  font-size: 0.9rem;
+  color: var(--cu-red-deep);
+  font-weight: 700;
+  background: var(--lie-bg);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+}
+
+.bars-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .bars-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vote-card-option {
+  background: var(--cu-cloud);
+  border: 2px solid var(--cu-line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.vote-card-option.truth-option {
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
+.vote-card-option.lie-option {
+  border-color: rgba(228, 37, 27, 0.3);
+}
+
+.option-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.option-label {
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.truth-option .option-label { color: var(--truth-color); }
+.lie-option .option-label { color: var(--cu-red-deep); }
+
+.option-percentage {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--cu-ink);
+}
+
+.option-count {
+  font-size: 0.95rem;
+  color: var(--cu-slate);
+  font-weight: 600;
+}
+
+.option-bar-bg {
+  height: 14px;
+  background: var(--cu-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.option-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.truth-option .option-bar-fill {
+  background: var(--truth-gradient);
+}
+
+.lie-option .option-bar-fill {
+  background: var(--lie-gradient);
+}
+
+/* Giant Reveal Stage Banner */
+.reveal-banner {
+  display: none;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border-radius: var(--radius);
+  animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  box-shadow: var(--shadow-lg);
+}
+
+.reveal-banner.reveal-TRUTH {
+  display: block;
+  background: var(--truth-bg);
+  border: 4px solid var(--truth-color);
+}
+
+.reveal-banner.reveal-LIE {
+  display: block;
+  background: var(--lie-bg);
+  border: 4px solid var(--cu-red);
+}
+
+.reveal-title-sub {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 800;
+  color: var(--cu-slate);
+  margin-bottom: 0.5rem;
+}
+
+.reveal-title-main {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.reveal-TRUTH .reveal-title-main { color: var(--truth-color); }
+.reveal-LIE .reveal-title-main { color: var(--cu-red-deep); }
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+
+/* ==========================================================================
+   2. AUDIENCE MOBILE VOTE SCREEN (/vote)
+   ========================================================================== */
+.audience-container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.audience-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.audience-speaker {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cu-red-deep);
+}
+
+.audience-statement {
+  font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--cu-ink);
+}
+
+/* Big Cardiff Pill Vote Buttons */
+.vote-buttons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.btn-vote {
+  width: 100%;
+  padding: 1.5rem 1.5rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--cu-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.btn-vote:active {
+  transform: translateY(2px);
+}
+
+.btn-truth {
+  background: var(--truth-gradient);
+  box-shadow: 0 10px 25px var(--truth-glow);
+}
+
+.btn-truth:hover {
+  filter: brightness(1.05);
+}
+
+.btn-lie {
+  background: var(--lie-gradient);
+  box-shadow: 0 10px 25px var(--lie-glow);
+}
+
+.btn-lie:hover {
+  filter: brightness(1.05);
+}
+
+.btn-vote:disabled {
+  background: var(--cu-slate) !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* User Selection Active Box */
+.voted-status-box {
+  display: none;
+  background: var(--cu-white);
+  border: 2px solid var(--cu-line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.voted-status-box.active {
+  display: block;
+}
+
+.voted-badge-choice {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.voted-badge-choice.TRUTH {
+  background: var(--truth-bg);
+  color: var(--truth-color);
+  border: 2px solid var(--truth-color);
+}
+
+.voted-badge-choice.LIE {
+  background: var(--lie-bg);
+  color: var(--cu-red-deep);
+  border: 2px solid var(--cu-red);
+}
+
+/* Audience Individual Result Card */
+.personal-reveal-card {
+  display: none;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.4s forwards;
+}
+
+.personal-reveal-card.correct {
+  display: block;
+  background: var(--truth-bg);
+  border: 3px solid var(--truth-color);
+}
+
+.personal-reveal-card.incorrect {
+  display: block;
+  background: var(--lie-bg);
+  border: 3px solid var(--cu-red);
+}
+
+.personal-reveal-icon {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.personal-reveal-title {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+
+.correct .personal-reveal-title { color: var(--truth-color); }
+.incorrect .personal-reveal-title { color: var(--cu-red-deep); }
+
+.personal-reveal-sub {
+  font-size: 0.95rem;
+  color: var(--cu-slate);
+  font-weight: 600;
+}
+
+
+/* ==========================================================================
+   3. ADMIN CONSOLE STYLES (/admin)
+   ========================================================================== */
+.admin-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem);
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cu-slate);
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  background: var(--cu-white);
+  border: 1px solid var(--cu-line);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  color: var(--cu-ink);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--cu-red);
+  outline: 2px solid var(--cu-red);
+  outline-offset: 1px;
+}
+
+.form-textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Radio button toggle for Ground Truth */
+.truth-radio-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.radio-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.radio-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-card-content {
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: 2px solid var(--cu-line);
+  background: var(--cu-cloud);
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--cu-slate);
+  transition: all 0.15s;
+}
+
+.radio-card input:checked + .radio-card-content.truth-radio {
+  background: var(--truth-bg);
+  border-color: var(--truth-color);
+  color: var(--truth-color);
+}
+
+.radio-card input:checked + .radio-card-content.lie-radio {
+  background: var(--lie-bg);
+  border-color: var(--cu-red);
+  color: var(--cu-red-deep);
+}
+
+/* Admin Buttons */
+.controls-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-btn {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 999px;
+  border: none;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: transform 0.12s, box-shadow 0.15s, background 0.15s;
+  color: var(--cu-white);
+}
+
+.admin-btn:active {
+  transform: translateY(1px);
+}
+
+.btn-start-voting {
+  background: var(--cu-red);
+  box-shadow: 0 8px 18px rgba(212, 0, 43, 0.3);
+}
+
+.btn-start-voting:hover {
+  background: var(--cu-red-dark);
+}
+
+.btn-lock-voting {
+  background: var(--cu-gold);
+  color: var(--cu-ink);
+  box-shadow: 0 6px 15px rgba(255, 179, 0, 0.3);
+}
+
+.btn-reveal {
+  background: var(--truth-gradient);
+  box-shadow: 0 8px 18px var(--truth-glow);
+}
+
+.btn-reset {
+  background: var(--cu-cloud);
+  border: 1px solid var(--cu-line);
+  color: var(--cu-slate);
+}
+
+.btn-reset:hover {
+  background: var(--cu-line);
+  color: var(--cu-ink);
+}
+
+/* Preset Cards */
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.preset-item {
+  background: var(--cu-cloud);
+  border: 1px solid var(--cu-line);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.15s;
+}
+
+.preset-item:hover {
+  border-color: var(--cu-red);
+}
+
+.preset-text {
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+  color: var(--cu-ink);
+  font-weight: 600;
+}
+
+.preset-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+}
+
+.preset-tag.TRUTH { background: var(--truth-bg); color: var(--truth-color); }
+.preset-tag.LIE { background: var(--lie-bg); color: var(--cu-red-deep); }

@@ -1,0 +1,17 @@
+{
+  "name": "truth-or-lie-app",
+  "version": "1.0.0",
+  "description": "Interactive conference presentation voting app for Truth or Lie",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ip": "^2.0.1",
+    "qrcode": "^1.5.3",
+    "selfsigned": "^5.5.0",
+    "socket.io": "^4.7.5"
+  }
+}

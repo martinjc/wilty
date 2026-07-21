@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Would Cardiff University Lie to You?</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body id="audience-view">
+  <!-- Header Bar -->
+  <header class="top-bar" style="padding: 1rem;">
+    <div class="brand" style="font-size: 1.1rem;">
+      <div class="brand-icon" style="width:34px; height:34px; font-size:1.1rem;">CU</div>
+      <span class="brand-title">Would Cardiff University Lie to You?</span>
+    </div>
+    <div class="status-badge" id="audience-connected-count">
+      Online
+    </div>
+  </header>
+
+  <!-- Mobile Voting Layout -->
+  <main class="audience-container">
+    
+    <!-- Statement Card -->
+    <div class="glass-card audience-card">
+      <div class="audience-speaker" id="audience-speaker">Presenter</div>
+      <div class="audience-statement" id="audience-statement">
+        Waiting for presenter to reveal the statement...
+      </div>
+    </div>
+
+    <!-- Personalized Reveal Card (Initially Hidden) -->
+    <div id="personal-reveal-card" class="personal-reveal-card">
+      <div id="personal-reveal-icon" class="personal-reveal-icon">🎉</div>
+      <div id="personal-reveal-title" class="personal-reveal-title">YOU WERE RIGHT!</div>
+      <div id="personal-reveal-sub" class="personal-reveal-sub">Great job!</div>
+    </div>
+
+    <!-- Voted Status Indicator (Shown after vote cast) -->
+    <div id="voted-status-box" class="voted-status-box">
+      <div style="font-size: 0.85rem; color: var(--cu-slate); font-weight: 700; text-transform: uppercase;">Vote Registered</div>
+      <div id="voted-badge-choice" class="voted-badge-choice TRUTH">YOU VOTED: TRUTH</div>
+      <div style="font-size: 0.85rem; color: var(--cu-slate); margin-top: 0.75rem;">
+        Keep an eye on the main screen for the verdict!
+      </div>
+    </div>
+
+    <!-- Vote Selection Buttons -->
+    <div class="vote-buttons-grid" id="vote-buttons-grid">
+      <button class="btn-vote btn-truth" id="btn-vote-truth" disabled>
+        <span>👍</span> TRUTH
+      </button>
+      <button class="btn-vote btn-lie" id="btn-vote-lie" disabled>
+        <span>👎</span> LIE
+      </button>
+    </div>
+
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

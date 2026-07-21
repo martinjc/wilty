@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Would Cardiff University Lie to You?</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body id="display-view">
+  <!-- Cardiff University Header Bar -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">CU</div>
+      <span class="brand-title">Would Cardiff University Lie to You?</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <div class="status-badge" id="display-status-badge">
+        <span class="pulse-dot" id="display-status-dot"></span>
+        <span id="display-status-text">WAITING FOR START</span>
+      </div>
+      <div class="status-badge" id="display-connected-count">
+        0 Connected
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Display Container -->
+  <main class="display-container">
+    <div class="display-grid">
+      <!-- Left Area: Statement & Results -->
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+        
+        <!-- Statement Hero Box -->
+        <div class="glass-card statement-hero">
+          <div class="speaker-tag" id="display-speaker">Presenter</div>
+          <div class="statement-text" id="display-statement">
+            Welcome to Would Cardiff University Lie to You? Waiting for the presenter to start...
+          </div>
+        </div>
+
+        <!-- Giant Answer Reveal Banner (Hidden until reveal) -->
+        <div id="display-reveal-banner" class="reveal-banner">
+          <div class="reveal-title-sub" id="reveal-title-sub">THE VERDICT IS</div>
+          <div class="reveal-title-main" id="reveal-title-main">IT IS A TRUTH! 🎉</div>
+        </div>
+
+        <!-- Live Voting Results Section -->
+        <div class="glass-card results-container">
+          <div class="results-header">
+            <div class="results-title">
+              <span>📊 Audience Votes</span>
+            </div>
+            <div class="total-votes-count" id="total-votes-count">0 Total Votes</div>
+          </div>
+
+          <div class="bars-wrapper">
+            <!-- TRUTH Card -->
+            <div class="vote-card-option truth-option">
+              <div class="option-top">
+                <div class="option-label">
+                  <span>👍</span> TRUTH
+                </div>
+                <div class="option-percentage" id="truth-percent">0%</div>
+              </div>
+              <div class="option-bar-bg">
+                <div class="option-bar-fill" id="truth-bar-fill"></div>
+              </div>
+              <div class="option-count" id="truth-count">0 votes</div>
+            </div>
+
+            <!-- LIE Card -->
+            <div class="vote-card-option lie-option">
+              <div class="option-top">
+                <div class="option-label">
+                  <span>👎</span> LIE
+                </div>
+                <div class="option-percentage" id="lie-percent">0%</div>
+              </div>
+              <div class="option-bar-bg">
+                <div class="option-bar-fill" id="lie-bar-fill"></div>
+              </div>
+              <div class="option-count" id="lie-count">0 votes</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: QR Code & Audience Join Instructions -->
+      <div class="glass-card qr-card">
+        <div class="qr-instructions">
+          <strong>JOIN THE VOTE</strong>
+          Scan with your phone camera to cast your vote!
+        </div>
+        <div class="qr-wrapper">
+          <img id="qr-code-img" src="" alt="Scan QR Code to Vote">
+        </div>
+        <div class="qr-url-pill" id="qr-url-pill">Loading URL...</div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
