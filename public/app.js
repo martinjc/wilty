@@ -270,7 +270,7 @@ function initAdminView() {
       const item = document.createElement('div');
       item.className = 'preset-item';
       item.innerHTML = `
-        <span class="preset-text">${p.text}</span>
+        <span class="preset-text">${p.speaker}: ${p.text}</span>
         <span class="preset-tag ${p.answer}">${p.answer}</span>
       `;
       item.addEventListener('click', () => {
