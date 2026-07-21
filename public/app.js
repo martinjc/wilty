@@ -201,6 +201,45 @@ function initAudienceView() {
 // 3. ADMIN CONSOLE LOGIC
 // ============================================================================
 function initAdminView() {
+  const codePrompt = document.getElementById('admin-code-prompt');
+  const codeInput = document.getElementById('admin-code-input');
+  const submitCodeBtn = document.getElementById('btn-submit-code');
+  const errorMsg = document.getElementById('code-error-msg');
+
+  if (codePrompt) {
+    // Wait for socket connection before showing prompt
+    setTimeout(() => {
+      codePrompt.style.display = 'flex';
+    }, 100);
+
+    submitCodeBtn.addEventListener('click', () => {
+      const code = codeInput ? codeInput.value.trim() : '';
+      if (!code) return;
+      socket.emit('verify-admin-code', code);
+    });
+
+    if (codeInput) {
+      codeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          submitCodeBtn.click();
+        }
+      });
+    }
+
+    socket.on('admin-verified', () => {
+      codePrompt.style.display = 'none';
+    });
+
+    socket.on('admin-code-invalid', () => {
+      errorMsg.style.display = 'block';
+      if (codeInput) codeInput.value = '';
+      codeInput.focus();
+      setTimeout(() => {
+        errorMsg.style.display = 'none';
+      }, 3000);
+    });
+  }
+
   const statementInput = document.getElementById('admin-statement-input');
   const speakerInput = document.getElementById('admin-speaker-input');
   const radioTruth = document.getElementById('radio-truth');

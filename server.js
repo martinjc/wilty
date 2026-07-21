@@ -5,8 +5,13 @@ const { Server } = require('socket.io');
 const QRCode = require('qrcode');
 const ip = require('ip');
 
+// Allow overriding via ADMIN_ACCESS_CODE env var, or generate a random 6-digit code
+const ADMIN_ACCESS_CODE = process.env.ADMIN_ACCESS_CODE || String(Math.floor(100000 + Math.random() * 900000));
+
 const app = express();
 const server = http.createServer(app);
+// Map of socketId -> true for verified admins
+const adminAuthStore = new Map();
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -84,6 +89,11 @@ app.get('/api/info', async (req, res) => {
   }
 });
 
+// Helper to check if a socket is authenticated as admin
+function isAdminVerified(socket) {
+  return adminAuthStore.has(socket.id) === true;
+}
+
 // Helper to calculate tally numbers
 function calculateTallies() {
   let truth = 0;
@@ -128,6 +138,16 @@ io.on('connection', (socket) => {
   // Broadcast user count change
   io.emit('connection-count', io.engine.clientsCount);
 
+  // Admin code verification
+  socket.on('verify-admin-code', (code) => {
+    if (code === ADMIN_ACCESS_CODE) {
+      adminAuthStore.set(socket.id, true);
+      socket.emit('admin-verified');
+    } else {
+      socket.emit('admin-code-invalid');
+    }
+  });
+
   // Audience vote submit
   socket.on('submit-vote', (choice) => {
     if (gameState.phase !== 'VOTING') return;
@@ -143,8 +163,9 @@ io.on('connection', (socket) => {
     broadcastState();
   });
 
-  // Admin Actions
+  // Admin Actions - gate with code verification
   socket.on('admin-set-statement', (data) => {
+    if (!isAdminVerified(socket)) return;
     const { statement, speaker, correctAnswer } = data;
     if (statement) gameState.statement = statement;
     if (speaker !== undefined) gameState.speaker = speaker;
@@ -153,6 +174,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('admin-start-voting', (data) => {
+    if (!isAdminVerified(socket)) return;
     if (data) {
       if (data.statement) gameState.statement = data.statement;
       if (data.speaker !== undefined) gameState.speaker = data.speaker;
@@ -165,16 +187,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('admin-lock-voting', () => {
+    if (!isAdminVerified(socket)) return;
     gameState.phase = 'LOCKED';
     broadcastState();
   });
 
   socket.on('admin-reveal-answer', () => {
+    if (!isAdminVerified(socket)) return;
     gameState.phase = 'REVEALED';
     broadcastState();
   });
 
   socket.on('admin-reset', () => {
+    if (!isAdminVerified(socket)) return;
     gameState.phase = 'IDLE';
     gameState.votes = {};
     gameState.statement = 'Waiting for next statement...';
@@ -183,6 +208,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    adminAuthStore.delete(socket.id);
     io.emit('connection-count', io.engine.clientsCount);
   });
 });
@@ -191,6 +217,7 @@ server.listen(PORT, () => {
   const localIp = ip.address();
   console.log(`===================================================`);
   console.log(` Would Cardiff University Lie to You? is running!`);
+  console.log(` Admin Access Code: ${ADMIN_ACCESS_CODE}`);
   console.log(` Main Display: http://localhost:${PORT}/display`);
   console.log(` Admin Console: http://localhost:${PORT}/admin`);
   console.log(` Audience Join URL: http://${localIp}:${PORT}/vote`);
