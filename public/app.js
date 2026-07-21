@@ -78,8 +78,8 @@ function initDisplayView() {
     if (data.phase === 'REVEALED' && data.correctAnswer) {
       if (revealBanner) {
         revealBanner.className = `reveal-banner reveal-${data.correctAnswer}`;
-        if (revealTitleSub) revealTitleSub.textContent = `THE OFFICIAL VERDICT IS`;
-        if (revealTitleMain) revealTitleMain.textContent = data.correctAnswer === 'TRUTH' ? 'IT IS A TRUTH! 🎉' : 'IT IS A LIE! ❌';
+        if (revealTitleSub) revealTitleSub.textContent = `THE VERDICT IS:`;
+        if (revealTitleMain) revealTitleMain.textContent = data.correctAnswer === 'TRUTH' ? "It's the TRUTH! 🎉" : "It's a LIE! ❌";
       }
     } else {
       if (revealBanner) revealBanner.className = 'reveal-banner';
