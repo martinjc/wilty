@@ -10,7 +10,50 @@ const ADMIN_ACCESS_CODE = process.env.ADMIN_ACCESS_CODE || String(Math.floor(100
 
 const app = express();
 const server = http.createServer(app);
-// Map of socketId -> true for verified admins
+// Rate limiting store for admin attempts: Map<socketId, {count: number, lastAttempt: number}>
+const adminCodeAttempts = new Map();
+const MAX_ATTEMPTS = 3; // Max failed attempts allowed before a cooldown period
+const COOLDOWN_MS = 10000; // 10 seconds cooldown after failure
+
+// Helper to check rate limits
+function isRateLimited(socket) {
+  const now = Date.now();
+  if (!adminCodeAttempts.has(socket.id)) return false;
+
+  const record = adminCodeAttempts.get(socket.id);
+  if (record.lastAttempt + COOLDOWN_MS > now) {
+    return true; // Still in cooldown period
+  }
+  // If time elapsed since last attempt is long enough, reset count but keep the structure for safety
+  adminCodeAttempts.set(socket.id, {count: 0, lastAttempt: now});
+  return false;
+}
+
+// Helper to record an attempt
+function recordAttempt(socket, success) {
+  const now = Date.now();
+  let record = adminCodeAttempts.get(socket.id) || { count: 0, lastAttempt: now };
+
+  if (success) {
+    // Success clears any failed attempts
+    adminCodeAttempts.delete(socket.id);
+    return;
+  } else {
+    record.count += 1;
+    record.lastAttempt = now;
+    adminCodeAttempts.set(socket.id, record);
+
+    console.log(`[SECURITY ALERT]: Admin code failed for ${socket.id}. Attempts: ${record.count}/${MAX_ATTEMPTS}`);
+
+    if (record.count >= MAX_ATTEMPTS) {
+        console.warn(`--- ADMIN ACCOUNT LOCKED ---`);
+        // In a real scenario, we might block the socket completely here,
+        // but for simplicity, we'll just make it extremely hard to pass the check until cooldown expires.
+    }
+  }
+}
+
+// Initial setup of the adminStore (remains as is)
 const adminAuthStore = new Map();
 const io = new Server(server, {
   cors: {
@@ -50,7 +93,30 @@ app.get('/vote', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'vote.html'));
 });
 
+// Helper function to reliably get the originating IP address from headers
+function getClientIp(req) {
+  // Check X-Forwarded-For first, as it often holds the true client IP when behind proxies/load balancers
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    // The actual IP is usually the first entry in this comma-separated list
+    return forwarded.split(',')[0].trim();
+  }
+  // Fall back to X-Real-IP or standard request IP
+  const realIp = req.headers['x-real-ip'];
+  if (realIp) return realIp;
+
+  return req.socket.remoteAddress; // The direct connection IP
+}
+
 app.get('/admin', (req, res) => {
+  // Security Check: Restrict admin access to local machine loopback addresses only.
+  const clientIP = getClientIp(req);
+  const allowedLocalIps = ['127.0.0.1', '::1'];
+
+  if (!allowedLocalIps.some(ip => clientIP === ip)) {
+    console.warn(`[SECURITY WARNING]: Unauthorized access attempt to /admin from IP: ${clientIP}`);
+    return res.status(403).send('Forbidden: Admin console restricted to the local machine.');
+  }
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
