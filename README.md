@@ -32,12 +32,12 @@ The server will start at `http://localhost:3000`. The console logs all the relev
 | Role           | URL                  | Description                                       |
 |----------------|----------------------|---------------------------------------------------|
 | Main Display   | `/` or `/display`    | Projected screen showing statements and live tallies |
-| Admin Console  | `/admin`             | Presenter control panel                           |
+| Admin Console  | `/admin`             | Presenter control panel (Requires local machine IP)                           |
 | Audience Vote  | `/vote`              | Mobile-friendly page for attendees to cast votes  |
 
 ## How to Run an Event
 
-1. **Presenter**: Open `/admin`, enter a statement (or pick from presets), set the speaker name, and mark whether it's `Truth` or `Lie`.
+1. **Presenter**: Open `/admin`, enter a statement (or pick from presets), set the speaker name, and mark whether it's `Truth` or `Lie`. Be aware of rate limits: consecutive failed attempts will trigger a temporary cooldown period.
 2. Click **Start Voting** — the main display updates with the statement and shows a QR code.
 3. **Audience**: Scan the QR code (or visit the voting URL) on their phones to cast a `Truth` or `Lie` vote.
 4. When enough votes have come in, click **Lock Votes**.
@@ -46,16 +46,7 @@ The server will start at `http://localhost:3000`. The console logs all the relev
 
 ## Admin Controls
 
-| Field / Button         | Description                                           |
-|------------------------|-------------------------------------------------------|
-| Speaker name          | Displayed alongside the statement                     |
-| Statement text        | The story/statement presented to the audience         |
-| Ground Truth           | True/False answer set by the presenter               |
-| Preset library         | Pre-loaded sample statements (clicks filled them in)  |
-| Start Voting          | Begins a voting round and clears previous votes       |
-| Lock Votes            | Closes the voting window                              |
-| Reveal Answer         | Shows the correct answer to everyone                  |
-| Reset                 | Returns to idle state for the next round              |
+| *Security*           | **Accessing `/admin` requires:** <br>1. The machine IP must be local (`127.0.0.1`).<br>2. A valid Admin Access Code entered via a socket event.<br>3. Multiple failed attempts trigger temporary rate limits. |
 
 ## Game Phases
 
